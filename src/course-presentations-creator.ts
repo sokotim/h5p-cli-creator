@@ -1,5 +1,6 @@
 import { ContentCreator } from "./content-creator";
 import { H5pPackage } from "./h5p-package";
+import { H5pCoursePresentation } from "./models/h5p-course-presentation";
 import { H5pCoursePresentationContent } from "./models/h5p-course-presentations-content";
 
 export class CoursePresentationsCreator extends ContentCreator<
@@ -21,14 +22,15 @@ export class CoursePresentationsCreator extends ContentCreator<
   protected async addContent(
     contentObject: H5pCoursePresentationContent,
   ): Promise<void> {
+    contentObject.presentation = new H5pCoursePresentation();
     contentObject.presentation.slides = new Array();
     for (const line of this.data ) {
         const slide = {
         elements: [{
-            x: 1,
-            y: 1,
-            width: 400,
-            height: 300,
+            x: 10,
+            y: 10,
+            width: 80,
+            height: 80,
             action: {
             library: "H5P.AdvancedText 1.1",
             params: {
