@@ -1,3 +1,4 @@
+import { parse } from "node-html-parser";
 import { ContentCreator } from "./content-creator";
 import { H5pPackage } from "./h5p-package";
 import { H5pCoursePresentation } from "./models/h5p-course-presentation";
@@ -8,9 +9,7 @@ export class CoursePresentationsCreator extends ContentCreator<
 > {
   constructor(
     h5pPackage: H5pPackage,
-    private data: Array<{
-        text: string,
-    }>,
+    private html: string,
   ) {
     super(h5pPackage);
   }
@@ -24,7 +23,8 @@ export class CoursePresentationsCreator extends ContentCreator<
   ): Promise<void> {
     contentObject.presentation = new H5pCoursePresentation();
     contentObject.presentation.slides = new Array();
-    for (const line of this.data ) {
+    let doc = parse(this.html);
+    for (const slideSection of doc.querySelectorAll("section.slide") ) {
         const slide = {
         elements: [{
             x: 10,
@@ -34,7 +34,7 @@ export class CoursePresentationsCreator extends ContentCreator<
             action: {
             library: "H5P.AdvancedText 1.1",
             params: {
-                text: line.text,
+                text: slideSection.innerHTML,
             },
             metadata: {
                 contentType: "Text",

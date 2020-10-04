@@ -28,20 +28,18 @@ export class CoursePresentationModule implements yargs.CommandModule {
     await this.runCoursePresentation(argv.input, argv.output, argv.l);
   }
   private async runCoursePresentation(
-    csvfile: string,
+    htmlfile: string,
     outputfile: string,
     language: string,
   ): Promise<void> {
     console.log("Creating course presentation content type.");
-    csvfile = csvfile.trim();
+    htmlfile = htmlfile.trim();
     outputfile = outputfile.trim();
-
-    let csv = fs.readFileSync(csvfile, "utf8");
-    let csvParsed = papa.parse(csv, {header: true, skipEmptyLines: true});
+    let html = fs.readFileSync(htmlfile, "utf8");
     let h5pPackage = await H5pPackage.createFromHub("H5P.CoursePresentation", language);
     let coursePresentationCreator = new CoursePresentationsCreator(
         h5pPackage,
-        csvParsed.data,
+        html,
     );
     await coursePresentationCreator.create();
     coursePresentationCreator.savePackage(outputfile);
