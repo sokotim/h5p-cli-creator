@@ -9,7 +9,10 @@ export class CoursePresentationsCreator extends ContentCreator<
 > {
   constructor(
     h5pPackage: H5pPackage,
-    private html: string,
+    private slides: Array<{
+      text: string;
+    }>,
+    private title: string,
   ) {
     super(h5pPackage);
   }
@@ -23,9 +26,8 @@ export class CoursePresentationsCreator extends ContentCreator<
   ): Promise<void> {
     contentObject.presentation = new H5pCoursePresentation();
     contentObject.presentation.slides = new Array();
-    let doc = parse(this.html);
-    for (const slideSection of doc.querySelectorAll("section.slide") ) {
-        const slide = {
+    for (const slide of this.slides ) {
+        const newSlide = {
         elements: [{
             x: 10,
             y: 10,
@@ -34,7 +36,7 @@ export class CoursePresentationsCreator extends ContentCreator<
             action: {
             library: "H5P.AdvancedText 1.1",
             params: {
-                text: slideSection.innerHTML,
+                text: slide.text,
             },
             metadata: {
                 contentType: "Text",
@@ -51,8 +53,11 @@ export class CoursePresentationsCreator extends ContentCreator<
             goToSlideType: "specified",
         }],
         };
-        contentObject.presentation.slides.push(slide);
+        contentObject.presentation.slides.push(newSlide);
     }
   }
-  protected addSettings(contentObject: H5pCoursePresentationContent) {}
+  protected addSettings(contentObject: H5pCoursePresentationContent) {
+    this.h5pPackage.h5pMetadata.title = this.title;
+    this.h5pPackage.addMetadata(this.h5pPackage.h5pMetadata);
+  }
 }

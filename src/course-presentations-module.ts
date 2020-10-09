@@ -4,6 +4,7 @@ import * as papa from "papaparse";
 
 import { CoursePresentationsCreator } from "./course-presentations-creator";
 import { H5pPackage } from "./h5p-package";
+import parse from "node-html-parser";
 
 /**
  * This is the yargs module for course presentations
@@ -36,10 +37,18 @@ export class CoursePresentationModule implements yargs.CommandModule {
     htmlfile = htmlfile.trim();
     outputfile = outputfile.trim();
     let html = fs.readFileSync(htmlfile, "utf8");
+    let doc = parse(html);
+    let slides = new Array();
+    let title = doc.querySelector("title").innerText;
+    console.log(title);
+    for (const slideSection of doc.querySelectorAll("section.slide") ) {
+      slides.push({text: slideSection.innerHTML});
+    }
     let h5pPackage = await H5pPackage.createFromHub("H5P.CoursePresentation", language);
     let coursePresentationCreator = new CoursePresentationsCreator(
         h5pPackage,
-        html,
+        slides,
+        title,
     );
     await coursePresentationCreator.create();
     coursePresentationCreator.savePackage(outputfile);
